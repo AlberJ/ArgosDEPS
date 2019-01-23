@@ -1,0 +1,160 @@
+package br.edu.ifpb.argos.bean;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.persistence.PersistenceException;
+import br.edu.ifpb.argos.entity.Investigacao;
+import br.edu.ifpb.argos.facade.InvestigacaoController;
+
+@ManagedBean(name = "investigacaoBean")
+@ViewScoped
+public class InvestigacaoBean extends GenericBean implements Serializable {
+	private static final long serialVersionUID = 1L;
+
+	private Investigacao investigacao;
+	private Integer id = null;
+	private String titulo;
+	private String descricao;
+	private Date data;
+	private List<Investigacao> investigacoes;
+	private boolean editando = false;
+	private String argumento;
+
+	public String salvar() {
+		InvestigacaoController controller = new InvestigacaoController();
+		String proxView = null;
+
+		if (id != null) {
+			investigacao = controller.buscar(id);
+			investigacao.setDescricao(descricao);
+			controller.atualizar(investigacao);
+			proxView = "fatos?faces-redirect=true";
+		} else {
+			try {
+				investigacao = new Investigacao();
+				investigacao.setTitulo(titulo);
+				investigacao.setDescricao(descricao);
+				investigacao.setData(data);
+				controller.cadastrar(investigacao);
+				this.addSuccessMessage("Investição salva com sucesso");
+				proxView = "investigacoes?faces-redirect=true";
+				investigacao = new Investigacao();
+			} catch (PersistenceException e) {
+				this.addErrorMessage("Erro ao tentar salvar a investigação.");
+			}
+		}
+		return proxView;
+	}
+
+	public String editar(Investigacao i) {
+		this.titulo = i.getTitulo();
+		this.descricao = i.getDescricao();
+		this.data = i.getData();
+		this.id = i.getId();
+		this.editando = true;
+		return "cadastro?faces-redirect=true&includeViewParams=true";
+	}
+
+	public String excluir(Investigacao i) {
+		String proxima_pagina = null;
+		InvestigacaoController controller = new InvestigacaoController();
+		controller.excluir(i);
+		this.addSuccessMessage("Investigação excluída com sucesso");
+		proxima_pagina = "investigacoes?faces-redirect=true";
+		return proxima_pagina;
+	}
+
+	public void listarInvestigacoes() {
+		InvestigacaoController controller = new InvestigacaoController();
+		this.investigacoes = controller.listar();
+	}
+
+	public List<Investigacao> getinvestigacoes() {
+		return investigacoes;
+	}
+
+	public void setInvestigacoes(List<Investigacao> investigacoes) {
+		this.investigacoes = investigacoes;
+	}
+
+	public String goCadastro() {
+		return "/investigacao/cadastro?faces-redirect=true";
+	}
+
+	public String goInvestigacoes() {
+		return "/investigacao/investigacoes?faces-redirect=true";
+	}
+
+	public Investigacao getInvestigacao() {
+		return investigacao;
+	}
+
+	public void setInvestigacao(Investigacao i) {
+		this.investigacao = i;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	public String getTitulo() {
+		return titulo;
+	}
+
+	public void setTitulo(String titulo) {
+		this.titulo = titulo;
+	}
+
+	public String getDescricao() {
+		return descricao;
+	}
+
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
+	}
+
+	public Date getData() {
+		return data;
+	}
+
+	public void setData(Date data) {
+		this.data = data;
+	}
+
+	public String getArgumento() {
+		return argumento;
+	}
+
+	public void setArgumento(String argumento) {
+		this.argumento = argumento;
+	}
+
+	public boolean isEditando() {
+		return editando;
+	}
+
+	public void setEditando(boolean editando) {
+		this.editando = editando;
+	}
+
+//	public String pesquisarFatos() {
+//		FatoController controller = new FatoController();
+//		this.fatos = controller.pesquisar(argumento);
+//	
+//		if (fatos.isEmpty())
+//			this.addErrorMessage("Não há fatos para o argumento informado.");
+//		return "busca?faces-redirect=true&includeViewParams=true";
+//	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+}

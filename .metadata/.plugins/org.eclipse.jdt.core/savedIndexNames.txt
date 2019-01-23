@@ -1,0 +1,1 @@
+INDEX VERSION 1.131+C:\Users\alber\Pictures\DEPS\Sistema\Argos-master\.metadata\.plugins\org.eclipse.jdt.core
